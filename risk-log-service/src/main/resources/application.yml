@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: risk-service
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
+balance-service:
+  ribbon:
+    listOfServers: localhost:8081
+agency-service:
+  ribbon:
+    listOfServers: localhost:8091

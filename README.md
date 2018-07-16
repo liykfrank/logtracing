@@ -33,11 +33,23 @@ This project provides an implementation of circuit breaker with hystrix. Further
 
 The demo includes 6 applications, 4 fucntion services and 2 infrastructure services:
 
-![](images/comps.png?raw=true)
+![](images/riskseq.png?raw=true)
 
 Below diagram explains the dependencies and communications of above services  
 
-![](images/hystrix.png?raw=true)
+![](images/log1.png?raw=true)
+
+![](images/log2.png?raw=true)
+
+
+![](images/log3.png?raw=true)
+
+
+![](images/log4.png?raw=true)
+
+
+![](images/log5.png?raw=true)
+
 
 The following diagram shows the communication model of Spring Cloud Turbine AMQP:
 

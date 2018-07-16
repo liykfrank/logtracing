@@ -1,0 +1,11 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: balance-service
+assurance-service:
+  ribbon:
+    listOfServers: localhost:8092
+salesdata-service:
+  ribbon:
+    listOfServers: localhost:8093

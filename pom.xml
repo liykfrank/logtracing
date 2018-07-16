@@ -7,11 +7,10 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-  <!--  <module>agency-service</module>
-    <module>salesdata-service</module>
-    <module>balance-service</module>
-    <module>risk-service</module>
-    <module>hystrix-dashboard</module>
-    <module>hystrix-turbine-mq</module>-->
+    <module>agency-log-service</module>
+    <module>salesdata-log-service</module>
+    <module>balance-log-service</module>
+    <module>risk-log-service</module>
+    <module>assurance-service</module>
   </modules>
 </project>
