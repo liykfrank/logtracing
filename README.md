@@ -604,3 +604,9 @@ In case of Agency service is out of service, you wiill have something like this:
 
 
 And this proves that the fallback of Hystrix is working well.
+
+![](images/zipkin0.png?raw=true)
+
+![](images/zipkin1.png?raw=true)
+
+![](images/zipkin2.png?raw=true)

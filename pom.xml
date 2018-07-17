@@ -12,5 +12,6 @@
     <module>balance-log-service</module>
     <module>risk-log-service</module>
     <module>assurance-service</module>
+    <module>zipkin-server-stream</module>
   </modules>
 </project>

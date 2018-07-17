@@ -3,6 +3,14 @@ server:
 spring:
   application:
     name: salesdata-service
+  sleuth:
+    sampler:
+      percentage: 1.0
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
 logging:                                # 配置日志级别，让hibernate打印出执行的SQL
   level:
     root: INFO

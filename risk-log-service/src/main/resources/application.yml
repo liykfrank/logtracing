@@ -3,6 +3,9 @@ server:
 spring:
   application:
     name: risk-service
+  sleuth:
+    sampler:
+      percentage: 1.0
   rabbitmq:
     host: localhost
     port: 30000

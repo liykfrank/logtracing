@@ -3,6 +3,14 @@ server:
 spring:
   application:
     name: agency-service
+  sleuth:
+    sampler:
+      percentage: 1.0
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
   jpa:
     generate-ddl: false
     show-sql: true

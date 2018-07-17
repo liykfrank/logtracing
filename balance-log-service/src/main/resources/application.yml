@@ -3,6 +3,14 @@ server:
 spring:
   application:
     name: balance-service
+  sleuth:
+    sampler:
+      percentage: 1.0
+  rabbitmq:
+    host: localhost
+    port: 30000
+    username: guest
+    password: guest
 assurance-service:
   ribbon:
     listOfServers: localhost:8092
