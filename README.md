@@ -81,58 +81,158 @@ For the data persistence a in-memory H2 database was used.
 The following is the dependencies used in this project:
 
 ```xml
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-amqp</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>net.logstash.logback</groupId>
+		<artifactId>logstash-logback-encoder</artifactId>
+		<version>4.9</version>
+	</dependency>
+	<dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-classic</artifactId>
+		<version>1.2.3</version>
+	</dependency>
+	<dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-core</artifactId>
+		<version>1.2.3</version>
+	</dependency>
 ```
 
-To enable loading of the `DiscoveryClient`, add `@EnableDiscoveryClient` to the according configuration or application class like this:
+To enable /logback-spring.xml like this:
 
-```java
-@RestController
-public class Controller {
-  @Autowired
-  private AgencyRepository agencyRepository;
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+	​
+	<springProperty scope="context" name="springAppName" source="spring.application.name"/>
+	<!-- Example for logging into the build folder of your project -->
+	<property name="LOG_FILE" value="${BUILD_FOLDER:-build}/${springAppName}"/>​
 
-  @GetMapping("/{id}")
-  public Agency findById(@PathVariable Long id) {
-    Agency findOne = this.agencyRepository.findOne(id);
-    return findOne;
-  }
-}
+	<!-- You can override this to have a custom pattern -->
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+	<!-- Appender to log to console -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<!-- Minimum logging level to be presented in the console logs-->
+			<level>DEBUG</level>
+		</filter>
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+
+	<!-- Appender to log to file -->​
+	<appender name="flatfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_FILE}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+	​
+	<!-- Appender to log to file in a JSON format -->
+	<appender name="logstash" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_FILE}.json</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_FILE}.json.%d{yyyy-MM-dd}.gz</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp>
+					<timeZone>UTC</timeZone>
+				</timestamp>
+				<pattern>
+					<pattern>
+						{
+						"severity": "%level",
+						"service": "${springAppName:-}",
+						"trace": "%X{X-B3-TraceId:-}",
+						"span": "%X{X-B3-SpanId:-}",
+						"parent": "%X{X-B3-ParentSpanId:-}",
+						"exportable": "%X{X-Span-Export:-}",
+						"pid": "${PID:-}",
+						"thread": "%thread",
+						"class": "%logger{40}",
+						"rest": "%message"
+						}
+					</pattern>
+				</pattern>
+			</providers>
+		</encoder>
+	</appender>
+	
+	<appender name="AMQP"
+		class="org.springframework.amqp.rabbit.logback.AmqpAppender">
+		<layout>
+			<pattern>
+				{
+				"severity": "%level",
+				"service": "${springAppName:-}",
+				"trace": "%X{X-B3-TraceId:-}",
+				"span": "%X{X-B3-SpanId:-}",
+				"parent": "%X{X-B3-ParentSpanId:-}",
+				"exportable": "%X{X-Span-Export:-}",
+				"pid": "${PID:-}",
+				"thread": "%thread",
+				"class": "%logger{40}",
+				"rest": "%message"
+				}
+			</pattern>
+		</layout>
+
+		<!-- RabbitMQ connection -->
+		<host>localhost</host>
+		<port>30000</port>
+		<username>guest</username>
+		<password>guest</password>
+
+		<applicationId>agency-service</applicationId>
+		<routingKeyPattern>agency-service</routingKeyPattern>
+		<declareExchange>true</declareExchange>
+		<exchangeType>direct</exchangeType>
+		<exchangeName>ex_logstash</exchangeName>
+		<!-- <queue>hello</queue> -->
+
+		<virtualHost>/</virtualHost>
+		<generateId>true</generateId>
+		<charset>UTF-8</charset>
+		<durable>true</durable>
+		<deliveryMode>PERSISTENT</deliveryMode>
+	</appender>
+	​
+	<root level="INFO">
+		<appender-ref ref="console"/>
+ 	<appender-ref ref="AMQP"/> 
+		<!-- uncomment this to have also JSON logs -->
+		<!--<appender-ref ref="logstash"/>-->
+		<!--<appender-ref ref="flatfile"/>-->
+	</root>
+</configuration>
 ```
-Here is the configuration in `application
-.properties`:
+A bug: the service name will appear in the logs instead of bootstrap.if you set the spring.application.name in bootstrap.yaml then the name is present in the logs without doing the change.
+Add /bootstrap.yml in /src/main/resources/
 
 ```
-server:
-  port: 8091
 spring:
   application:
     name: agency-service
-  jpa:
-    generate-ddl: false
-    show-sql: true
-    hibernate:
-      ddl-auto: none
-  datasource:                           
-    platform: h2                       
-    schema: classpath:schema.sql       
-    data: classpath:data.sql
 ```
+you can find the bug here:
+https://github.com/spring-cloud/spring-cloud-sleuth/issues/330
+
 You could build and run this application follow below  steps:
 - Go to agency-service directory
 ```
@@ -610,3 +710,5 @@ And this proves that the fallback of Hystrix is working well.
 ![](images/zipkin1.png?raw=true)
 
 ![](images/zipkin2.png?raw=true)
+
+![](images/kibana.png?raw=true)

@@ -14,4 +14,4 @@ spring:
 logging:
   level:
     root: INFO
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: INFO

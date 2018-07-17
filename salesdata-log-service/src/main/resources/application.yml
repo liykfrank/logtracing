@@ -14,9 +14,9 @@ spring:
 logging:                                # 配置日志级别，让hibernate打印出执行的SQL
   level:
     root: INFO
-    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: INFO
     org.hibernate: INFO
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.type.descriptor.sql.BasicExtractor: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    org.hibernate.type.descriptor.sql.BasicExtractor: INFO
     
 ## INFO
