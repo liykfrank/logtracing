@@ -35,6 +35,9 @@ The demo includes 6 applications, 4 fucntion services and 2 infrastructure servi
 
 ![](images/riskseq.png?raw=true)
 
+
+![](images/trace-id.png?raw=true)
+
 Below diagram explains the dependencies and communications of above services  
 
 ![](images/log1.png?raw=true)

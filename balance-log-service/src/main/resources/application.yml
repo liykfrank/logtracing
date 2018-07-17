@@ -9,3 +9,7 @@ assurance-service:
 salesdata-service:
   ribbon:
     listOfServers: localhost:8093
+logging:
+  level:
+    root: INFO
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
